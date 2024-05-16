@@ -27,6 +27,23 @@ class Limite {
     }
 }
 
+class Player {
+    constructor({ posicao,velocidade }) {
+        this.posicao = posicao
+        this.velocidade = velocidade
+        this.radius = 15
+    }
+
+    draw() {
+        context.beginPath()
+        context.arc(this.posicao.x, this.posicao.y, this.radius, 0, Math.PI * 2)
+        context.fillStyle = 'yellow'
+        context.fill()
+        context.closePath()
+    }
+
+}
+
 const mapa = [
     ['-','-','-','-','-','-'],
     ['-',' ',' ',' ',' ','-'],
@@ -35,6 +52,17 @@ const mapa = [
     ['-','-','-','-','-','-']
 ];
 const limites = [];
+
+const player = new Player({
+    posicao: {
+        x:Limite.largura + Limite.largura / 2,
+        y:Limite.altura + Limite.altura / 2
+    },
+    velocidade: {
+        x: 0,
+        y: 0
+    }
+})
 
 mapa.forEach((linha, i) => {
    linha.forEach((simbolo, j) => {
@@ -54,3 +82,5 @@ mapa.forEach((linha, i) => {
 limites.forEach(limite => {
     limite.draw()
 });
+
+player.draw()
