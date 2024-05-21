@@ -41,16 +41,13 @@ class Player {
         context.fill()
         context.closePath()
     }
-
+    update() {
+        this.draw()
+        this.posicao.x += this.velocidade.x
+        this.posicao.y += this.velocidade.y
+    }
 }
 
-const mapa = [
-    ['-','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-','-']
-];
 const limites = [];
 
 const player = new Player({
@@ -63,6 +60,31 @@ const player = new Player({
         y: 0
     }
 })
+
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    }
+}
+
+let lastKey = ''
+
+const mapa = [
+    ['-','-','-','-','-','-'],
+    ['-',' ',' ',' ',' ','-'],
+    ['-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ','-'],
+    ['-','-','-','-','-','-']
+];
 
 mapa.forEach((linha, i) => {
    linha.forEach((simbolo, j) => {
@@ -79,8 +101,67 @@ mapa.forEach((linha, i) => {
    }) 
 });
 
-limites.forEach(limite => {
-    limite.draw()
-});
+function animate() {
+    requestAnimationFrame(animate)
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    limites.forEach(limite => {
+        limite.draw()
+    });
+    
+    player.update()
+    player.velocidade.y = 0
+    player.velocidade.x = 0
 
-player.draw()
+    if (keys.w.pressed && lastKey == 'w') {
+        player.velocidade.y = -5
+    } else if (keys.a.pressed && lastKey == 'a') {
+        player.velocidade.x = -5
+    } else if (keys.s.pressed && lastKey == 's') {
+        player.velocidade.y = 5
+    } else if (keys.d.pressed && lastKey == 'd') {
+        player.velocidade.x = 5
+    }
+}
+
+animate()
+
+addEventListener('keydown', ({key}) => {
+    switch (key) {
+        case 'w':
+            keys.w.pressed = true
+            lastKey = 'w'
+            break
+        case 'a':
+            keys.a.pressed = true
+            lastKey = 'a'
+            break
+        case 's':
+            keys.s.pressed = true
+            lastKey = 's'
+            break
+        case 'd':
+            keys.d.pressed = true
+            lastKey = 'd'
+            break
+    }
+    console.log(keys.d.pressed)
+    console.log(keys.s.pressed)
+})
+
+addEventListener('keyup', ({key}) => {
+    switch (key) {
+        case 'w':
+            keys.w.pressed = false
+            break
+        case 'a':
+            keys.a.pressed = false
+            break
+        case 's':
+            keys.s.pressed = false
+            break
+        case 'd':
+            keys.d.pressed = false
+            break
+    }
+    console.log(player.velocidade)
+})
