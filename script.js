@@ -22,7 +22,8 @@ class Limite {
     draw() {
         context.fillStyle = 'blue';
         context.fillRect(
-            this.posicao.x, this.posicao.y, this.width, this.height
+            this.posicao.x, this.posicao.y, 
+            this.width, this.height
         );
     }
 }
@@ -104,13 +105,25 @@ mapa.forEach((linha, i) => {
 function animate() {
     requestAnimationFrame(animate)
     context.clearRect(0, 0, canvas.width, canvas.height)
-    limites.forEach(limite => {
-        limite.draw()
+    limites.forEach((limite) => {
+        limite.draw();
+        if(
+            player.posicao.y - player.radius + player.velocidade.y<= 
+            limite.posicao.y + limite.altura &&
+            player.position.x + player.radius + player.velocidade.x >= 
+            limite.posicao.x && 
+            player.posicao.y + player.radius + player.velocidade.y >=
+            limite.posicao.y &&
+            player.posicao.x - player.radius + player.velocidade.x <=
+            limite.posicao.x + limite.largura){
+                player.velocidade.y = 0;
+                player.velocidade.x = 0;
+        }
     });
     
-    player.update()
-    player.velocidade.y = 0
-    player.velocidade.x = 0
+    player.update();
+    player.velocidade.y = 0;
+    player.velocidade.x = 0;
 
     if (keys.w.pressed && lastKey == 'w') {
         player.velocidade.y = -5
