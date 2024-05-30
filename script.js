@@ -1,62 +1,62 @@
 const canvas = document.querySelector('canvas');
-const context = canvas.getContext('2d');
+const c = canvas.getContext('2d');
 
-if(!context) alert('Canvas - error')
+if(!c) alert('Canvas - error')
 else{
-    //usa a altura e largura default do navegador
+    //usa a height e width default do navegador
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     //console.log(canvas);
-    //console.log(context);
+    //console.log(c);
 }
 
-class Limite {
-    static largura = 40;
-    static altura = 40;
-    constructor({posicao}, ) {
-        this.posicao = posicao;
+class Boundary {
+    static width = 40;
+    static height = 40;
+    constructor({position}, ) {
+        this.position = position;
         this.width = 40;
         this.height = 40;
     }
 
     draw() {
-        context.fillStyle = 'blue';
-        context.fillRect(
-            this.posicao.x, this.posicao.y, 
+        c.fillStyle = 'blue';
+        c.fillRect(
+            this.position.x, this.position.y, 
             this.width, this.height
         );
     }
 }
 
 class Player {
-    constructor({ posicao,velocidade }) {
-        this.posicao = posicao
-        this.velocidade = velocidade
+    constructor({ position,velocity }) {
+        this.position = position
+        this.velocity = velocity
         this.radius = 15
     }
 
     draw() {
-        context.beginPath()
-        context.arc(this.posicao.x, this.posicao.y, this.radius, 0, Math.PI * 2)
-        context.fillStyle = 'yellow'
-        context.fill()
-        context.closePath()
+        c.beginPath()
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = 'yellow'
+        c.fill()
+        c.closePath()
     }
     update() {
         this.draw()
-        this.posicao.x += this.velocidade.x
-        this.posicao.y += this.velocidade.y
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
     }
 }
 
 const limites = [];
 
 const player = new Player({
-    posicao: {
-        x:Limite.largura + Limite.largura / 2,
-        y:Limite.altura + Limite.altura / 2
+    position: {
+        x:Boundary.width + Boundary.width / 2,
+        y:Boundary.height + Boundary.height / 2
     },
-    velocidade: {
+    velocity: {
         x: 0,
         y: 0
     }
@@ -79,22 +79,22 @@ const keys = {
 
 let lastKey = ''
 
-const mapa = [
-    ['-','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-','-']
+const map = [
+    ['-','-','-','-','-', '-','-'],
+    ['-',' ',' ',' ',' ', ' ','-'],
+    ['-',' ','-',' ','-', ' ','-'],
+    ['-',' ',' ',' ',' ', ' ','-'],
+    ['-','-','-','-','-', '-','-']
 ];
 
-mapa.forEach((linha, i) => {
-   linha.forEach((simbolo, j) => {
-        switch(simbolo){
+map.forEach((linha, i) => {
+   linha.forEach((symbol, j) => {
+        switch(symbol){
             case '-': 
-                limites.push(new Limite({
-                    posicao: {
-                        x: Limite.largura * j, 
-                        y: Limite.altura * i
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
                     }
                 }))
                 break;
@@ -104,36 +104,39 @@ mapa.forEach((linha, i) => {
 
 function animate() {
     requestAnimationFrame(animate)
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    limites.forEach((limite) => {
-        limite.draw();
+    c.clearRect(0, 0, canvas.width, canvas.height)
+
+
+    if (keys.w.pressed && lastKey == 'w') {
+        player.velocity.y = -5
+    } else if (keys.a.pressed && lastKey == 'a') {
+        player.velocity.x = -5
+    } else if (keys.s.pressed && lastKey == 's') {
+        player.velocity.y = 5
+    } else if (keys.d.pressed && lastKey == 'd') {
+        player.velocity.x = 5
+    }
+
+    limites.forEach((boundary) => {
+        boundary.draw();
         if(
-            player.posicao.y - player.radius + player.velocidade.y<= 
-            limite.posicao.y + limite.altura &&
-            player.position.x + player.radius + player.velocidade.x >= 
-            limite.posicao.x && 
-            player.posicao.y + player.radius + player.velocidade.y >=
-            limite.posicao.y &&
-            player.posicao.x - player.radius + player.velocidade.x <=
-            limite.posicao.x + limite.largura){
-                player.velocidade.y = 0;
-                player.velocidade.x = 0;
+            player.position.y - player.radius + player.velocity.y<= 
+            boundary.position.y + boundary.height &&
+            player.position.x + player.radius + player.velocity.x >= 
+            boundary.position.x && 
+            player.position.y + player.radius + player.velocity.y >=
+            boundary.position.y &&
+            player.position.x - player.radius + player.velocity.x <=
+            boundary.position.x + boundary.width){
+                console.log('we are colliding')
+                player.velocity.y = 0;
+                player.velocity.x = 0;
         }
     });
     
     player.update();
-    player.velocidade.y = 0;
-    player.velocidade.x = 0;
-
-    if (keys.w.pressed && lastKey == 'w') {
-        player.velocidade.y = -5
-    } else if (keys.a.pressed && lastKey == 'a') {
-        player.velocidade.x = -5
-    } else if (keys.s.pressed && lastKey == 's') {
-        player.velocidade.y = 5
-    } else if (keys.d.pressed && lastKey == 'd') {
-        player.velocidade.x = 5
-    }
+    player.velocity.y = 0;
+    player.velocity.x = 0;
 }
 
 animate()
@@ -157,8 +160,6 @@ addEventListener('keydown', ({key}) => {
             lastKey = 'd'
             break
     }
-    console.log(keys.d.pressed)
-    console.log(keys.s.pressed)
 })
 
 addEventListener('keyup', ({key}) => {
@@ -176,5 +177,4 @@ addEventListener('keyup', ({key}) => {
             keys.d.pressed = false
             break
     }
-    console.log(player.velocidade)
 })
