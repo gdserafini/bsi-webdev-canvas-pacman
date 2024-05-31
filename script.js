@@ -80,11 +80,21 @@ const keys = {
 let lastKey = ''
 
 const map = [
-    ['-','-','-','-','-', '-','-'],
-    ['-',' ',' ',' ',' ', ' ','-'],
-    ['-',' ','-',' ','-', ' ','-'],
-    ['-',' ',' ',' ',' ', ' ','-'],
-    ['-','-','-','-','-', '-','-']
+    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-'],
+    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ','-','-',' ','-',' ','-','-',' ',' ',' ',' ','-'],
+    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+    ['-','-','-','-','-',' ','-','-','-','-','-',' ','-','-','-','-','-'],
+    [' ',' ',' ',' ',' ',' ','-',' ',' ',' ','-',' ',' ',' ',' ',' ',' '],
+    ['-','-','-','-','-',' ','-','-','-','-','-',' ','-','-','-','-','-'],
+    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ','-','-',' ','-',' ','-','-',' ',' ',' ',' ','-'],
+    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-']
 ];
 
 map.forEach((linha, i) => {
@@ -102,33 +112,55 @@ map.forEach((linha, i) => {
    }) 
 });
 
-function animate() {
-    requestAnimationFrame(animate)
-    c.clearRect(0, 0, canvas.width, canvas.height)
+function circleCollidesWithRectangle({circle, rectangle}){
+    return (
+        circle.position.y - circle.radius + circle.velocity.y <= 
+        rectangle.position.y + rectangle.height &&
+        circle.position.x + circle.radius + circle.velocity.x >= 
+        rectangle.position.x && 
+        circle.position.y + circle.radius + circle.velocity.y >=
+        rectangle.position.y &&
+        circle.position.x - circle.radius + circle.velocity.x <=
+        rectangle.position.x + rectangle.width
+    );
+}
 
+function updateVelocity(player, xVelocity=0, yVelocity=0){
+    for(let i = 0; i < limites.length; i++) {
+        if(circleCollidesWithRectangle({
+            circle: {...player, velocity: {x: xVelocity, y: yVelocity}}, 
+            rectangle: limites[i]
+        })){
+            player.velocity.x = 0;
+            player.velocity.y = 0;
+            break;
+        }
+        else{ 
+            if(yVelocity){ player.velocity.y = yVelocity; }
+            else{ player.velocity.x = xVelocity; }
+        }
+    };
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    c.clearRect(0, 0, canvas.width, canvas.height);
 
     if (keys.w.pressed && lastKey == 'w') {
-        player.velocity.y = -5
+        updateVelocity(player, 0, -5);
     } else if (keys.a.pressed && lastKey == 'a') {
-        player.velocity.x = -5
+        updateVelocity(player, -5, 0);
     } else if (keys.s.pressed && lastKey == 's') {
-        player.velocity.y = 5
+        updateVelocity(player, 0, 5);
     } else if (keys.d.pressed && lastKey == 'd') {
-        player.velocity.x = 5
+        updateVelocity(player, 5, 0);
     }
 
     limites.forEach((boundary) => {
         boundary.draw();
-        if(
-            player.position.y - player.radius + player.velocity.y<= 
-            boundary.position.y + boundary.height &&
-            player.position.x + player.radius + player.velocity.x >= 
-            boundary.position.x && 
-            player.position.y + player.radius + player.velocity.y >=
-            boundary.position.y &&
-            player.position.x - player.radius + player.velocity.x <=
-            boundary.position.x + boundary.width){
-                console.log('we are colliding')
+        if(circleCollidesWithRectangle({
+            circle: player, rectangle: boundary
+        })){
                 player.velocity.y = 0;
                 player.velocity.x = 0;
         }
