@@ -13,18 +13,20 @@ else{
 class Boundary {
     static width = 40;
     static height = 40;
-    constructor({position}, ) {
+    constructor({position, image} ) {
         this.position = position;
         this.width = 40;
         this.height = 40;
+        this.image = image;
     }
 
     draw() {
-        c.fillStyle = 'blue';
-        c.fillRect(
-            this.position.x, this.position.y, 
-            this.width, this.height
-        );
+        // c.fillStyle = 'blue';
+        // c.fillRect(
+        //    this.position.x, this.position.y, 
+        //    this.width, this.height
+        // )
+        c.drawImage(this.image, this.position.x, this.position.y)
     }
 }
 
@@ -80,22 +82,28 @@ const keys = {
 let lastKey = ''
 
 const map = [
-    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ','-','-',' ','-',' ','-','-',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-',' ','-','-','-','-','-',' ','-','-','-','-','-'],
-    [' ',' ',' ',' ',' ',' ','-',' ',' ',' ','-',' ',' ',' ',' ',' ',' '],
-    ['-','-','-','-','-',' ','-','-','-','-','-',' ','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ','-','-',' ','-',' ','-','-',' ',' ',' ',' ','-'],
-    ['-',' ','-','-',' ','-',' ',' ','-',' ',' ','-',' ','-','-',' ','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-']
+    ['1','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','2'],
+    ['|',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','|'],
+    ['|',' ','[',']',' ','^',' ',' ','^',' ',' ','^',' ','[',']',' ','|'],
+    ['|',' ',' ',' ',' ','pcr',']',' ','|',' ','[','pcl',' ',' ',' ',' ','|'],
+    ['|',' ','[',']',' ','cb',' ',' ','cb',' ',' ','cb',' ','[',']',' ','|'],
+    ['|',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','|'],
+    ['4','-','-','-',']',' ','1','-','-','-','2',' ','[','-','-','-','3'],
+    [' ',' ',' ',' ',' ',' ','|',' ',' ',' ','|',' ',' ',' ',' ',' ',' '],
+    ['1','-','-','-',']',' ','4','-','-','-','3',' ','[','-','-','-','2'],
+    ['|',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','|'],
+    ['|',' ','[',']',' ','^',' ',' ','^',' ',' ','^',' ','[',']',' ','|'],
+    ['|',' ',' ',' ',' ','pcr',']',' ','|',' ','[','pcl',' ',' ',' ',' ','|'],
+    ['|',' ','[',']',' ','cb',' ',' ','cb',' ',' ','cb',' ','[',']',' ','|'],
+    ['|',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','|'],
+    ['4','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','3']
 ];
+
+function createImage(src) {
+    const image = new Image()
+    image.src = src
+    return image
+}
 
 map.forEach((linha, i) => {
    linha.forEach((symbol, j) => {
@@ -105,9 +113,118 @@ map.forEach((linha, i) => {
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
-                    }
+                    },
+                    image: createImage('./assets/pipeHorizontal.png')
                 }))
                 break;
+            case '|':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeVertical.png')
+                }))
+                break;
+            case '1':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeCorner1.png')
+                }))
+                break;
+            case '2':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeCorner2.png')
+                }))
+                break;
+            case '3':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeCorner3.png')
+                }))
+                break;
+            case '4':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeCorner4.png')
+                }))
+                break;
+            case 'b':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/block.png')
+                }))
+                break;
+            case '[':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/capLeft.png')
+                }))
+                break;                                   
+            case ']':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/capRight.png')
+                }))
+                break;                                   
+            case '^':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/capTop.png')
+                }))
+                break;                                   
+            case 'cb':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/capBottom.png')
+                }))
+                break;                                   
+            case 'pcr':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeConnectorRight.png')
+                }))
+                break;                                   
+            case 'pcl':
+                limites.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeConnectorLeft.png')
+                }))
+                break;                                   
         }
    }) 
 });
