@@ -1,6 +1,8 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
+const scoreEl = document.querySelector('#ScoreEl')
+
 if(!c) alert('Canvas - error')
 else{
     //usa a height e width default do navegador
@@ -51,6 +53,28 @@ class Player {
     }
 }
 
+class Ghost {
+    constructor({ position,velocity, color = 'red' }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 15
+        this.color = color
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = this.color
+        c.fill()
+        c.closePath()
+    }
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
+
 class Pallet {
     constructor({ position }) {
         this.position = position
@@ -67,7 +91,19 @@ class Pallet {
 }
 
 const pallets = [];
-const limites = [];
+const boundaries = [];
+const ghosts = [
+    new Ghost ({
+        position: {
+            x:Boundary.width * 8 + Boundary.width / 2,
+            y:Boundary.height + Boundary.height / 2
+        },
+        velocity: {
+            x: 0,
+            y: 0
+        }
+    })
+]
 const player = new Player({
     position: {
         x:Boundary.width + Boundary.width / 2,
@@ -95,6 +131,7 @@ const keys = {
 }
 
 let lastKey = ''
+let score = 0
 
 const map = [
     ['1','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','2'],
@@ -124,7 +161,7 @@ map.forEach((linha, i) => {
    linha.forEach((symbol, j) => {
         switch(symbol){
             case '-': 
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -133,7 +170,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '|':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -142,7 +179,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '1':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -151,7 +188,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '2':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -160,7 +197,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '3':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -169,7 +206,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '4':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -178,7 +215,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case 'b':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -187,7 +224,7 @@ map.forEach((linha, i) => {
                 }))
                 break;
             case '[':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -196,7 +233,7 @@ map.forEach((linha, i) => {
                 }))
                 break;                                   
             case ']':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -205,7 +242,7 @@ map.forEach((linha, i) => {
                 }))
                 break;                                   
             case '^':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -214,7 +251,7 @@ map.forEach((linha, i) => {
                 }))
                 break;                                   
             case 'cb':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -223,7 +260,7 @@ map.forEach((linha, i) => {
                 }))
                 break;                                   
             case 'pcr':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -232,7 +269,7 @@ map.forEach((linha, i) => {
                 }))
                 break;                                   
             case 'pcl':
-                limites.push(new Boundary({
+                boundaries.push(new Boundary({
                     position: {
                         x: Boundary.width * j, 
                         y: Boundary.height * i
@@ -266,10 +303,10 @@ function circleCollidesWithRectangle({circle, rectangle}){
 }
 
 function updateVelocity(player, xVelocity=0, yVelocity=0){
-    for(let i = 0; i < limites.length; i++) {
+    for(let i = 0; i < boundaries.length; i++) {
         if(circleCollidesWithRectangle({
             circle: {...player, velocity: {x: xVelocity, y: yVelocity}}, 
-            rectangle: limites[i]
+            rectangle: boundaries[i]
         })){
             player.velocity.x = 0;
             player.velocity.y = 0;
@@ -287,20 +324,100 @@ function animate() {
     c.clearRect(0, 0, canvas.width, canvas.height);
 
     if (keys.w.pressed && lastKey == 'w') {
-        updateVelocity(player, 0, -5);
+        for (let i = 0; i < boundaries.length; i++) {
+
+            const boundary = boundaries[i]
+
+                if (circleCollidesWithRectangle({
+                circle: {...player, velocity: {
+                    x: 0,
+                    y: -5
+                }},
+                rectangle: boundary
+                })
+            ){
+            player.velocity.y = 0;
+            break
+        } else {
+            player.velocity.y = -5
+        }
+    }  
     } else if (keys.a.pressed && lastKey == 'a') {
-        updateVelocity(player, -5, 0);
+        for (let i = 0; i < boundaries.length; i++) {
+
+            const boundary = boundaries[i]
+
+                if (circleCollidesWithRectangle({
+                circle: {...player, velocity: {
+                    x: -5,
+                    y: 0
+                }},
+                rectangle: boundary
+                })
+            ){
+            player.velocity.x = 0;
+            break
+        } else {
+            player.velocity.x = -5
+        }
+    }  
     } else if (keys.s.pressed && lastKey == 's') {
-        updateVelocity(player, 0, 5);
+        for (let i = 0; i < boundaries.length; i++) {
+
+            const boundary = boundaries[i]
+
+                if (circleCollidesWithRectangle({
+                circle: {...player, velocity: {
+                    x: 0,
+                    y: 5
+                }},
+                rectangle: boundary
+                })
+            ){
+            player.velocity.y = 0;
+            break
+        } else {
+            player.velocity.y = 5
+        }
+    }  
     } else if (keys.d.pressed && lastKey == 'd') {
-        updateVelocity(player, 5, 0);
+        for (let i = 0; i < boundaries.length; i++) {
+
+            const boundary = boundaries[i]
+
+                if (circleCollidesWithRectangle({
+                circle: {...player, velocity: {
+                    x: 5,
+                    y: 0
+                }},
+                rectangle: boundary
+                })
+            ){
+            player.velocity.x = 0;
+            break
+        } else {
+            player.velocity.x = 5
+        };
+    }}
+
+    for (let i = pallets.length - 1; 0 < i; i--){
+        const pallet = pallets[i]
+
+        pallet.draw();
+
+        if (
+            Math.hypot(pallet.position.x - player.position.x,
+             pallet.position.y - player.position.y) < pallet.radius + player.radius)
+            {
+                console.log("touching")
+                pallets.splice(i, 1)
+                score += 10
+                scoreEl.innerHTML =score
+            }
     }
 
-    pallets.forEach(pallet => {
-        pallet.draw();
-    })
 
-    limites.forEach((boundary) => {
+    boundaries.forEach((boundary) => {
         boundary.draw();
         if(circleCollidesWithRectangle({
             circle: player, rectangle: boundary
@@ -311,8 +428,18 @@ function animate() {
     });
     
     player.update();
-    player.velocity.y = 0;
-    player.velocity.x = 0;
+
+    ghosts.forEach(ghost => {
+        ghost.update()
+
+        const collisions =[]
+        boundaries.forEach(boundary => {
+
+            
+
+
+        })
+    })
 }
 
 animate()
