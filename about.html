@@ -13,26 +13,6 @@
     font-family: 'Press Start 2P', sans-serif;
   }
 </style>
-<p
-  class="flex items-center justify-between"
-  style="color: white; font-size: 14px; margin-bottom: 6px"
->
-  <span><span>Score:</span><span id="scoreEl">0</span></span>
-
-  <svg
-    id="pauseButton"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    class="w-5 h-5 cursor-pointer hidden"
-  >
-    <path
-      fill-rule="evenodd"
-      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM9 8.25a.75.75 0 00-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 00.75-.75V9a.75.75 0 00-.75-.75H9zm5.25 0a.75.75 0 00-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 00.75-.75V9a.75.75 0 00-.75-.75h-.75z"
-      clip-rule="evenodd"
-    />
-  </svg>
-</p>
 
 <div class="relative">
   <div class="absolute inset-0 flex flex-col items-center justify-center">
@@ -45,41 +25,27 @@
         id="startButton"
         class="text-black text-sm bg-yellow-400 px-4 py-2 rounded-full hover:bg-yellow-300"
       >
-        Start Game
+        Equipe
       </button><br><br>
       <button
         id="startButton"
         class="text-black text-sm bg-yellow-400 px-4 py-2 rounded-full hover:bg-yellow-300"
       >
-        <a href="about.html">Sobre</a>
-      </button>
-    </div>
-
-    <div
-      id="gameOverScreen"
-      class="bg-black/75 p-4 border-4 border-yellow-400 rounded text-center max-w-xs w-full hidden"
-    >
-      <p class="text-white text-xs mb-2">Game Over</p>
-      <h1 id="gameOverScoreLabel" class="text-white text-3xl">Score</h1>
-      <p class="text-white text-[10px] mb-2">Score</p>
+        Giordano Diniz Serafini
+      </button><br><br>
       <button
-        id="restartGameButton"
-        class="text-black text-xs bg-yellow-400 px-4 py-2 rounded-full hover:bg-yellow-300"
+        id="startButton"
+        class="text-black text-sm bg-yellow-400 px-4 py-2 rounded-full hover:bg-yellow-300"
       >
-        Restart Game
+        Victor Gabriel Eidt Bragagnolo
       </button>
-    </div>
-    <div
-      id="readyTag"
-      class="bg-black/75 p-4 border-4 border-yellow-400 rounded text-center max-w-xs w-full hidden"
-    >
-      <h1 class="text-white text-xl">Ready?</h1>
-    </div>
-    <div
-      id="goTag"
-      class="bg-black/75 p-4 border-4 border-yellow-400 rounded text-center max-w-xs w-full hidden"
-    >
-      <h1 class="text-white text-xl">Go!</h1>
+      <br><br>
+      <button
+        id="startButton"
+        class="text-black text-sm bg-yellow-400 px-4 py-2 rounded-full hover:bg-yellow-300"
+      >
+        <a href="index.html">Voltar</a>
+      </button>
     </div>
   </div>
   <canvas style="display: block; margin: 0 auto"></canvas>
