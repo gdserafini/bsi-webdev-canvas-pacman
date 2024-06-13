@@ -59,6 +59,7 @@ class Ghost {
         this.velocity = velocity
         this.radius = 15
         this.color = color
+        this.prevCollisions = []
     }
 
     draw() {
@@ -99,7 +100,7 @@ const ghosts = [
             y:Boundary.height + Boundary.height / 2
         },
         velocity: {
-            x: 0,
+            x: 5,
             y: 0
         }
     })
@@ -133,23 +134,59 @@ const keys = {
 let lastKey = ''
 let score = 0
 
+addEventListener('keydown', ({key}) => {
+    switch (key) {
+        case 'w':
+            keys.w.pressed = true
+            lastKey = 'w'
+            break
+        case 'a':
+            keys.a.pressed = true
+            lastKey = 'a'
+            break
+        case 's':
+            keys.s.pressed = true
+            lastKey = 's'
+            break
+        case 'd':
+            keys.d.pressed = true
+            lastKey = 'd'
+            break
+    }
+})
+
+addEventListener('keyup', ({key}) => {
+    switch (key) {
+        case 'w':
+            keys.w.pressed = false
+            break
+        case 'a':
+            keys.a.pressed = false
+            break
+        case 's':
+            keys.s.pressed = false
+            break
+        case 'd':
+            keys.d.pressed = false
+            break
+    }
+})
+
 const map = [
-    ['1','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','2'],
-    ['|','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','|'],
-    ['|','.','[',']','.','^','.','.','^','.','.','^','.','[',']','.','|'],
-    ['|','.','.','.','.','pcr',']','.','|','.','[','pcl','.','.','.','.','|'],
-    ['|','.','[',']','.','cb','.','.','cb','.','.','cb','.','[',']','.','|'],
-    ['|','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','|'],
-    ['4','-','-','-',']','.','1','-','-','-','2','.','[','-','-','-','3'],
-    [' ',' ',' ','  ',' ','.','|',' ',' ',' ','|','.',' ',' ',' ',' ',' '],
-    ['1','-','-','-',']','.','4','-','-','-','3','.','[','-','-','-','2'],
-    ['|','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','|'],
-    ['|','.','[',']','.','^','.','.','^','.','.','^','.','[',']','.','|'],
-    ['|','.','.','.','.','pcr',']','.','|','.','[','pcl','.','.','.','.','|'],
-    ['|','.','[',']','.','cb','.','.','cb','.','.','cb','.','[',']','.','|'],
-    ['|','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','|'],
-    ['4','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','3']
-];
+    ['1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '2'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', 'b', '.', '[', '7', ']', '.', 'b', '.', '|'],
+    ['|', '.', '.', '.', '.', 'cb', '.', '.', '.', '.', '|'],
+    ['|', '.', '[', ']', '.', '.', '.', '[', ']', '.', '|'],
+    ['|', '.', '.', '.', '.', '^', '.', '.', '.', '.', '|'],
+    ['|', '.', 'b', '.', '[', '+', ']', '.', 'b', '.', '|'],
+    ['|', '.', '.', '.', '.', 'cb', '.', '.', '.', '.', '|'],
+    ['|', '.', '[', ']', '.', '.', '.', '[', ']', '.', '|'],
+    ['|', '.', '.', '.', '.', '^', '.', '.', '.', '.', '|'],
+    ['|', '.', 'b', '.', '[', '5', ']', '.', 'b', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
+    ['4', '-', '-', '-', '-', '-', '-', '-', '-', '-', '3']
+  ]
 
 function createImage(src) {
     const image = new Image()
@@ -275,6 +312,33 @@ map.forEach((linha, i) => {
                         y: Boundary.height * i
                     },
                     image: createImage('./assets/pipeConnectorLeft.png')
+                }))
+                break;     
+            case '+':
+                boundaries.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeCross.png')
+                }))
+                break;     
+            case '5':
+                boundaries.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeConnectorTop.png')
+                }))
+                break;     
+            case '7':
+                boundaries.push(new Boundary({
+                    position: {
+                        x: Boundary.width * j, 
+                        y: Boundary.height * i
+                    },
+                    image: createImage('./assets/pipeConnectorBottom.png')
                 }))
                 break;     
             case '.':
@@ -433,51 +497,103 @@ function animate() {
         ghost.update()
 
         const collisions =[]
-        boundaries.forEach(boundary => {
+        boundaries.forEach((boundary) => {
+            if (
+                !collisions.includes('right') &&
+                circleCollidesWithRectangle({
+                circle: {...ghost, velocity: {
+                    x: 5,
+                    y: 0
+                }},
+                rectangle: boundary
+                })
+            ) {
+                collisions.push('right')
+            }
+            if (
+                !collisions.includes('left') && 
+                circleCollidesWithRectangle({
+                circle: {...ghost, velocity: {
+                    x: -5,
+                    y: 0
+                }},
+                rectangle: boundary
+                })
+            ) {
+                collisions.push('left')
+            }
+            if (
+                !collisions.includes('down') &&
+                circleCollidesWithRectangle({
+                circle: {...ghost, velocity: {
+                    x: 0,
+                    y: 5
+                }},
+                rectangle: boundary
+                })
+            ) {
+                collisions.push('down')
+            }
+            if (
+                !collisions.includes('up') &&
+                circleCollidesWithRectangle({
+                circle: {...ghost, velocity: {
+                    x: 0,
+                    y: -5
+                }},
+                rectangle: boundary
+                })
+            ) {
+                collisions.push('up')
+            }
+        })
 
+        if (collisions.length > ghost.prevCollisions.length) 
+            ghost.prevCollisions = collisions
+
+        if (JSON.stringify(collisions) !== JSON.stringify(ghost.prevCollisions)) {
+            if (ghost.velocity.x > 0) ghost.prevCollisions.push('right')
+            else if (ghost.velocity.x < 0) ghost.prevCollisions.push('left')
+            else if (ghost.velocity.y < 0) ghost.prevCollisions.push('up')
+            else if (ghost.velocity.y > 0) ghost.prevCollisions.push('down')
             
 
+            //console.log(collisions)
+            //console.log(ghost.prevCollisions)
 
-        })
+            const pathways = ghost.prevCollisions.filter(collision => {
+                return collision.includes(collision)
+            })
+            //console.log({ pathways })
+
+            const direction = pathways[Math.floor(Math.random() * pathways.length)]
+
+            console.log({direction})
+
+            switch(direction) {
+                case 'down':
+                    ghost.velocity.y = 5
+                    ghost.velocity.x = 0
+                    break
+                case 'up':
+                    ghost.velocity.y = -5
+                    ghost.velocity.x = 0
+                    break
+                case 'right':
+                    ghost.velocity.y = 0
+                    ghost.velocity.x = 5
+                    break
+                case 'left':
+                    ghost.velocity.y = 0
+                    ghost.velocity.x = -5
+                    break
+            }
+
+            ghost.prevCollisions = []
+        }
+
+        console.log(collisions)
     })
 }
 
 animate()
-
-addEventListener('keydown', ({key}) => {
-    switch (key) {
-        case 'w':
-            keys.w.pressed = true
-            lastKey = 'w'
-            break
-        case 'a':
-            keys.a.pressed = true
-            lastKey = 'a'
-            break
-        case 's':
-            keys.s.pressed = true
-            lastKey = 's'
-            break
-        case 'd':
-            keys.d.pressed = true
-            lastKey = 'd'
-            break
-    }
-})
-
-addEventListener('keyup', ({key}) => {
-    switch (key) {
-        case 'w':
-            keys.w.pressed = false
-            break
-        case 'a':
-            keys.a.pressed = false
-            break
-        case 's':
-            keys.s.pressed = false
-            break
-        case 'd':
-            keys.d.pressed = false
-            break
-    }
-})
